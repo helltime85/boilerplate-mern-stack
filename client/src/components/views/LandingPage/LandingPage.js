@@ -26,7 +26,7 @@ function LandingPage() {
     const renderCards = Products.map((product, index) => {
         return <Col lg={6} md={8} xs={24} key={index}>
             <Card
-                cover={<img style={{ width:'100%', maxHeight: '150px' }} src={`${process.env.LOCAL_URL}:5054/${product.images[0]}`} />}>
+                cover={<img style={{ width:'100%', maxHeight: '150px' }} src={`${global.local_url}:5054/${product.images[0]}`} />}>
                     
                 <Meta 
                     title={product.title}

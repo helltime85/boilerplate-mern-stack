@@ -58,7 +58,7 @@ function FileUpload(props) {
                 {Images.map((image, index) => (
                     <div onClick={() => deleteHandler(image)} key={index}>
                         <img style={{ minWidth: '300px', width: '300px', height: '240px' }} 
-                        src={`${process.env.LOCAL_URL}:5054/${image}`} />
+                        src={`${global.local_url}:5054/${image}`} />
                     </div>
                 ))}
             </div>
