@@ -2,20 +2,28 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const cors = require('cors')
-
-const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
-
-const config = require("./config/key");
-
-// const mongoose = require("mongoose");
-// mongoose
-//   .connect(config.mongoURI, { useNewUrlParser: true })
-//   .then(() => console.log("DB connected"))
-//   .catch(err => console.error(err));
-
+const morgan = require('morgan');
 const mongoose = require("mongoose");
-const connect = mongoose.connect(config.mongoURI,
+const cookieParser = require("cookie-parser");
+const kill = require('kill-port');
+const { killPortProcess } = require('kill-port-process');
+
+app.use(morgan('dev'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+app.use('/uploads', express.static('uploads'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/product', require('./routes/product'));
+
+require('dotenv').config();
+
+//console.log(`uri1 > ${process.env.MONGO_DB_URI}`);
+//console.log(`uri2 > ${config.mongoURI}`)
+
+const connect = mongoose.connect(process.env.MONGO_DB_URI,
   {
     useNewUrlParser: true, useUnifiedTopology: true,
     useCreateIndex: true, useFindAndModify: false
@@ -23,22 +31,22 @@ const connect = mongoose.connect(config.mongoURI,
   .then(() => console.log('MongoDB Connected...'))
   .catch(err => console.log(err));
 
-app.use(cors())
+app.use(cors());
 
 //to not get any deprecation warning or error
 //support parsing of application/x-www-form-urlencoded post data
-app.use(bodyParser.urlencoded({ extended: true }));
+//app.use(bodyParser.urlencoded({ extended: true }));
 //to get json data
 // support parsing of application/json type post data
-app.use(bodyParser.json());
-app.use(cookieParser());
+//app.use(bodyParser.json());
+//app.use(cookieParser());
 
-app.use('/api/users', require('./routes/users'));
+
 
 
 //use this to show the image you have in node js server to client (react js)
 //https://stackoverflow.com/questions/48914987/send-image-path-from-node-js-express-server-to-react-client
-app.use('/uploads', express.static('uploads'));
+
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === "production") {
@@ -50,11 +58,28 @@ if (process.env.NODE_ENV === "production") {
   // index.html for all page routes    html or routing and naviagtion
   app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "../client", "build", "index.html"));
-  });
+  }); 
 }
 
-const port = process.env.PORT || 5000
-
+const port = process.env.PORT || 5054;
+/*
+(async () => {
+  await killPortProcess(port); // takes a number, number[], string or string[]
+  //await killPortProcess(5055); // takes a number, number[], string or string[]
+})();
+*/
+/*
+(async () => {
+  try {
+    await kill(port, 'tcp');
+  } catch(err) {
+    console.error(err);
+  }
+  app.listen(port, () => {
+    console.log(`Server Listening on ${port}`);
+  });
+})();
+*/
 app.listen(port, () => {
-  console.log(`Server Listening on ${port}`)
+  console.log(`Server Listening on ${port}`);
 });
