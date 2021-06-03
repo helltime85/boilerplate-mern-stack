@@ -15,7 +15,13 @@ import { createStore, applyMiddleware } from 'redux';
 import promiseMiddleware from 'redux-promise';
 import ReduxThunk from 'redux-thunk';
 
-global.local_url = process.env.LOCAL_URL;
+require('dotenv');
+
+console.log(`local url1 ${process.env.REACT_APP_LOCAL_URL}`);
+console.log(`local url2 ${process.env.REACT_APP_TEST}`);
+console.log(`local url3 ${process.env.TEST1234}`);
+
+global.local_url = process.env.REACT_APP_LOCAL_URL;
 
 const createStoreWithMiddleware = applyMiddleware(promiseMiddleware, ReduxThunk)(createStore);
 

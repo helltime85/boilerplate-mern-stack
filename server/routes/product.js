@@ -44,13 +44,18 @@ router.post('/', (req, res) => {
 
 router.post('/products', (req, res) => {
   //const product = new Product(req.body);
+  let limit = req.body.limit ? parseInt(req.body.limit) : 20;
+  let skip = req.body.skip ? parseInt(req.body.skip) : 0;
+
   Product.find()
     .populate('writer')
+    .skip(skip)
+    .limit(limit)
     .exec((err, productInfo) => {
       if(err) {
         res.status(400).json({ success: false, });
       } else {
-        res.status(200).json({ success: true, productInfo });
+        res.status(200).json({ success: true, productInfo, PostSize: productInfo.length });
       }
     });
 });

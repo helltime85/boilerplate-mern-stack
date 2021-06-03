@@ -62,24 +62,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 const port = process.env.PORT || 5054;
-/*
-(async () => {
-  await killPortProcess(port); // takes a number, number[], string or string[]
-  //await killPortProcess(5055); // takes a number, number[], string or string[]
-})();
-*/
-/*
-(async () => {
-  try {
-    await kill(port, 'tcp');
-  } catch(err) {
-    console.error(err);
-  }
-  app.listen(port, () => {
-    console.log(`Server Listening on ${port}`);
-  });
-})();
-*/
+
 app.listen(port, () => {
   console.log(`Server Listening on ${port}`);
 });

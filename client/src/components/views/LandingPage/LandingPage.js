@@ -2,31 +2,63 @@ import React, { useEffect, useState } from 'react'
 import { FaCode } from "react-icons/fa";
 import axios from 'axios';
 import { Icon, Col, Card, Row } from 'antd';
+import ImageSlider from '../../utils/ImageSlider';
+
 const { Meta } = Card;
 
 function LandingPage() {
     const [Products, setProducts] = useState([]);
+    const [Skip, setSkip] = useState(0);
+    const [Limit, setLimit] = useState(8);
+    const [PostSize, setPostSize] = useState(0);
 
     useEffect(() => {
         let body = {
-
+            skip: Skip,
+            limit: Limit,
         };
 
-        axios.post('/api/product/products', body)
-            .then(response => {
-                if(response.data.success) {
-                    console.log(response.data);
-                    setProducts(response.data.productInfo);
-                } else {
-                    alert('조회중 오류 발생');
-                }
-            })
+        getProducts(body);
+
     }, []);
+
+    const getProducts = (body) => {
+        axios.post('/api/product/products', body)
+        .then(response => {
+            if(response.data.success) {
+                console.log(response.data);
+                if(body.loadMore) {
+                    setProducts([...Products, ...response.data.productInfo]);
+                } else {
+                    setProducts(response.data.productInfo);
+                }
+
+                setPostSize(response.data.PostSize);
+            } else {
+                alert('조회중 오류 발생');
+            }
+        })
+    }
     
+    const loadMoreHandler = (e) => {
+        let skip = Skip + Limit;
+            
+        let body = {
+            skip: skip,
+            limit: Limit,
+            loadMore: true,
+        };        
+
+        getProducts(body);
+
+        setSkip(skip);
+        
+    }
+
     const renderCards = Products.map((product, index) => {
         return <Col lg={6} md={8} xs={24} key={index}>
             <Card
-                cover={<img style={{ width:'100%', maxHeight: '150px' }} src={`${global.local_url}:5054/${product.images[0]}`} />}>
+                cover={<ImageSlider images={product.images} />}>
                     
                 <Meta 
                     title={product.title}
@@ -35,7 +67,6 @@ function LandingPage() {
             </Card>
         </Col>
     });
-
 
     return (
         <div style={{ width: '75%', margin: '3rem auto' }}>
@@ -50,10 +81,13 @@ function LandingPage() {
             <Row gutter={ [16, 16] }>
             {renderCards}
             </Row>
-            
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <button>더보기</button>
-            </div>
+
+            <br />
+            {PostSize >= Limit && 
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <button onClick={loadMoreHandler}>더보기</button>
+                </div>
+            }
         </div>
     )
 }
